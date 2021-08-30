@@ -10,10 +10,18 @@ class UserAdmin(BaseUserAdmin):
     list_display = (
         "email",
         "username",
+        "first_name",
+        "last_name",
         "is_active",
         "is_staff",
         "is_superuser",
         "last_login",
+    )
+    list_display_links = (
+        "email",
+        "username",
+        "first_name",
+        "last_name",
     )
     ordering = [
         "email",
@@ -52,11 +60,19 @@ class UserAdmin(BaseUserAdmin):
         ),
         (
             _("Permissions"),
-            {"fields": ("is_active", "is_staff", "is_superuser")},
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                ),
+            },
         ),
         (
             _("Important dates"),
-            {"fields": ("last_login",)},
+            {
+                "fields": ("last_login",),
+            },
         ),
     )
     add_fieldsets = (
