@@ -14,18 +14,15 @@
      - Echo the Path `export PATH="/usr/local/opt/mysql-client/bin:$PATH"`
      - Install the client `pip install mysqlclient`
    - Install Pillow (Needed for image mgmt) `pip install pillow`
-   - Install Coverage (Needed for testing) `pip install coverage`
 5. Create gcartApp directory -> `mkdir gcartapp`
 6. Push requirements to app directory -> `pip freeze > gcartapp/requirements.txt`
 
 ### Requirements.txt
 
 ```
-appdirs==1.4.4
 asgiref==3.4.1
-black==21.7b0
+black==21.8b0
 click==8.0.1
-coverage==5.5
 Django==3.2.6
 django-environ==0.4.5
 flake8==3.9.2
@@ -34,12 +31,14 @@ mypy-extensions==0.4.3
 mysqlclient==2.0.3
 pathspec==0.9.0
 Pillow==8.3.1
+platformdirs==2.2.0
 pycodestyle==2.7.0
 pyflakes==2.3.1
 pytz==2021.1
 regex==2021.8.28
 sqlparse==0.4.1
 tomli==1.2.1
+typing-extensions==3.10.0.1
 ```
 
 7. Create docker-compose file in top directory
