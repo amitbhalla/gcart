@@ -129,4 +129,6 @@ MEDIA_ROOT = "/vol/web/media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# first word "user" is the name of the app
+# second word "user" is the name of the model
 AUTH_USER_MODEL = "user.user"
