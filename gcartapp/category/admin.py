@@ -17,6 +17,9 @@ class CategoryAdmin(admin.ModelAdmin):
         "category_name",
         "slug",
     )
+    list_filter = [
+        "category_name",
+    ]
     ordering = [
         "id",
     ]

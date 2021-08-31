@@ -26,6 +26,10 @@ class ProductAdmin(admin.ModelAdmin):
         "stock",
         "is_available",
     ]
+    list_filter = [
+        "category",
+        "is_available",
+    ]
     ordering = [
         "id",
     ]

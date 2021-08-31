@@ -24,19 +24,19 @@
             <h3 class="section-title">Popular products</h3>
         </header><!-- sect-heading -->
 
-
         <div class="row">
+            {% for product in products %}
             <div class="col-md-3">
                 <div class="card card-product-grid">
-                    <a href="#" class="img-wrap"> <img src="#"> </a>
+                    <a href="#" class="img-wrap"> <img src="{{ product.image.url }}"> </a>
                     <figcaption class="info-wrap">
-                        <a href="#" class="title">Product Name</a>
-                        <div class="price mt-1">$100</div> <!-- price-wrap.// -->
+                        <a href="#" class="title">{{ product.product_name }}</a>
+                        <div class="price mt-1">${{ product.price|intcomma }}</div> <!-- price-wrap.// -->
                     </figcaption>
                 </div>
             </div> <!-- col.// -->
+            {% endfor %}
         </div> <!-- row.// -->
-
     </div><!-- container // -->
 </section>
 <!-- ========================= SECTION  END// ========================= -->
