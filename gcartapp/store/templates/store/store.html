@@ -141,7 +141,13 @@
                                     </div> <!-- price-wrap.// -->
                                 </div>
                                 {% if product.stock > 0 %}
-                                <a href="#" class="btn btn-block btn-primary">Add to Cart</a>
+                                <form action="{% url 'add_cart' product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" action="submit" class="btn btn-block btn-primary">
+                                        <span class="text">Add to Cart</span>
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </form>
                                 {% else %}
                                 <h4>Out of Stock</h4>
                                 {% endif %}

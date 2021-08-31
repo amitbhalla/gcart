@@ -33,8 +33,25 @@ class AddCartView(base.View):
 
 
 class CartView(base.View):
-    def get(self, request):
+    def get(
+        self, request, total=0, quantity=0, cart_items=None, cart_item=None
+    ):
+
+        try:
+            cart = Cart.objects.get(cart_id=get_session_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+
+            for cart_item in cart_items:
+                total += cart_item.product.price * cart_item.quantity
+                quantity += cart_item.quantity
+
+        except (Cart.DoesNotExist, CartItem.DoesNotExist):
+            pass
+
         context = {
-            "products": "cart",
+            "total": total,
+            "quantity": quantity,
+            "cart_items": cart_items,
         }
+        print(context)
         return render(request, "cart/cart.html", context)

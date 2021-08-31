@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load humanize %}
 {% block content %}
 
 
@@ -11,7 +11,9 @@
 
         <div class="row">
             <aside class="col-lg-9">
+                {% if cart_items %}
                 <div class="card">
+
                     <table class="table table-borderless table-shopping-cart">
                         <thead class="text-muted">
                             <tr class="small text-uppercase">
@@ -21,14 +23,16 @@
                                 <th scope="col" class="text-right" width="200"> </th>
                             </tr>
                         </thead>
+
                         <tbody>
+                            {% for cart_item in cart_items %}
                             <tr>
                                 <td>
                                     <figure class="itemside align-items-center">
-                                        <div class="aside"><img src="{% static 'home/images/items/11.jpg' %}"
-                                                class="img-sm"></div>
+                                        <div class="aside"><img src="{{ cart_item.product.image.url }}" class="img-sm">
+                                        </div>
                                         <figcaption class="info">
-                                            <a href="#" class="title text-dark">Camera Canon EOS M50 Kit</a>
+                                            <a href="#" class="title text-dark">{{ cart_item.product.product_name }}</a>
                                             <p class="text-muted small">Matrix: 25 Mpx <br> Brand: Canon</p>
                                         </figcaption>
                                     </figure>
@@ -41,7 +45,7 @@
                                                 <button class="btn btn-light" type="button" id="button-plus"> <i
                                                         class="fa fa-minus"></i> </button>
                                             </div>
-                                            <input type="text" class="form-control" value="1">
+                                            <input type="text" class="form-control" value="{{ cart_item.quantity }}">
                                             <div class="input-group-append">
                                                 <button class="btn btn-light" type="button" id="button-minus"> <i
                                                         class="fa fa-plus"></i> </button>
@@ -51,7 +55,7 @@
                                 </td>
                                 <td>
                                     <div class="price-wrap">
-                                        <var class="price">$1156.00</var>
+                                        <var class="price">${{ cart_item.product.price|intcomma }}</var>
                                         <small class="text-muted"> $315.20 each </small>
                                     </div> <!-- price-wrap .// -->
                                 </td>
@@ -59,11 +63,14 @@
                                     <a href="" class="btn btn-danger"> Remove</a>
                                 </td>
                             </tr>
+                            {% endfor %}
 
                         </tbody>
                     </table>
                 </div> <!-- card.// -->
-
+                {% else %}
+                <h2>Your Shopping Cart is Empty</h2>
+                {% endif %}
             </aside> <!-- col.// -->
             <aside class="col-lg-3">
 
