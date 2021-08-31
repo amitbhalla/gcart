@@ -34,7 +34,15 @@ class AddCartView(base.View):
 
 class CartView(base.View):
     def get(
-        self, request, total=0, quantity=0, cart_items=None, cart_item=None
+        self,
+        request,
+        total=0.0,
+        quantity=0,
+        cart_items=None,
+        cart_item=None,
+        tax_percentage=0.02,
+        tax=0.0,
+        grand_total=0.0,
     ):
 
         try:
@@ -45,6 +53,9 @@ class CartView(base.View):
                 total += cart_item.product.price * cart_item.quantity
                 quantity += cart_item.quantity
 
+            tax = total * tax_percentage
+            grand_total = total + tax
+
         except (Cart.DoesNotExist, CartItem.DoesNotExist):
             pass
 
@@ -52,6 +63,8 @@ class CartView(base.View):
             "total": total,
             "quantity": quantity,
             "cart_items": cart_items,
+            "tax": tax,
+            "grand_total": grand_total,
         }
         print(context)
         return render(request, "cart/cart.html", context)
