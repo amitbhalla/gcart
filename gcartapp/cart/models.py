@@ -18,7 +18,7 @@ class CartItem(models.Model):
     cart = models.ForeignKey(
         Cart, on_delete=models.CASCADE, related_name="cartitems"
     )
-    quanity = models.IntegerField()
+    quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

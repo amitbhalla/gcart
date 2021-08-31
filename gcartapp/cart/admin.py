@@ -29,6 +29,7 @@ class CartItemAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "product",
+        "quantity",
         "cart",
         "is_active",
     )
