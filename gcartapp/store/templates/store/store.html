@@ -140,7 +140,11 @@
                                         <span class="price">${{ product.price|intcomma }}</span>
                                     </div> <!-- price-wrap.// -->
                                 </div>
-                                <a href="#" class="btn btn-block btn-primary">Add to cart </a>
+                                {% if product.stock > 0 %}
+                                <a href="#" class="btn btn-block btn-primary">Add to Cart</a>
+                                {% else %}
+                                <h4>Out of Stock</h4>
+                                {% endif %}
                             </figcaption>
                         </figure>
                     </div> <!-- col.// -->
