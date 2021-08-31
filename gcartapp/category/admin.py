@@ -13,6 +13,10 @@ class CategoryAdmin(admin.ModelAdmin):
         "slug",
         "id",
     )
+    list_display_links = (
+        "category_name",
+        "slug",
+    )
     ordering = [
         "id",
     ]
