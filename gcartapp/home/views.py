@@ -4,7 +4,7 @@ from django.views.generic import base
 from store.models import Product
 
 
-class Index(base.View):
+class IndexView(base.View):
     def get(self, request):
         products = Product.objects.filter(is_available=True).order_by(
             "-modified_date"
