@@ -22,7 +22,7 @@
                         <h2 class="title">{{ product.product_name }}</h2>
 
                         <div class="mb-3">
-                            <var class="price h4">${{ product.price|intcomma }}</var>
+                            <var class="price h4">${{ product.price|floatformat:2|intcomma }}</var>
                         </div>
 
                         <p>{{ product.description|linebreaks }}</p>

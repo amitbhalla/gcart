@@ -32,6 +32,30 @@ class AddCartView(base.View):
         return redirect("cart")
 
 
+class RemoveCartView(base.View):
+    def post(self, request, product_id):
+        cart = Cart.objects.get(cart_id=get_session_id(request))
+        product = Product.objects.get(id=product_id)
+        cart_item = CartItem.objects.get(cart=cart, product=product)
+
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+
+        return redirect("cart")
+
+
+class RemoveCartItemView(base.View):
+    def post(self, request, product_id):
+        cart = Cart.objects.get(cart_id=get_session_id(request))
+        product = Product.objects.get(id=product_id)
+        cart_item = CartItem.objects.get(cart=cart, product=product)
+        cart_item.delete()
+        return redirect("cart")
+
+
 class CartView(base.View):
     def get(
         self,

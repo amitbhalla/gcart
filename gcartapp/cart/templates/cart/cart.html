@@ -43,30 +43,40 @@
                                     <!-- col.// -->
                                     <div class="col">
                                         <div class="input-group input-spinner">
-                                            <div class="input-group-prepend">
-                                                <button class="btn btn-light" type="button" id="button-minus"> <i
-                                                        class="fa fa-minus"></i> </button>
-                                            </div>
+                                            <form action="{% url 'remove_cart' cart_item.product.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <div class="input-group-prepend">
+                                                    <button class="btn btn-light" type="submit" action="submit"
+                                                        id="button-minus"> <i class="fa fa-minus"></i> </button>
+                                                </div>
+                                            </form>
                                             <input type="text" class="form-control" value="{{ cart_item.quantity }}">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-light" type="button" id="button-plus"> <i
-                                                        class="fa fa-plus"></i> </button>
-                                            </div>
-                                        </div> <!-- input-group.// -->
-                                    </div> <!-- col.// -->
+                                            <form action="{% url 'add_cart' cart_item.product.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-light" type="submit" action="submit"
+                                                        id="button-plus">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                            </form>
+                                        </div>
+                                    </div> <!-- input-group.// -->
                                 </td>
                                 <td>
                                     <div class="price-wrap">
-                                        <var class="price">${{ cart_item.sub_total|intcomma }}</var>
-                                        <small class="text-muted"> ${{ cart_item.product.price }} each </small>
+                                        <var class="price">${{ cart_item.sub_total|floatformat:2|intcomma }}</var>
+                                        <small class="text-muted"> ${{ cart_item.product.price|floatformat:2|intcomma }}
+                                            each </small>
                                     </div> <!-- price-wrap .// -->
                                 </td>
-                                <td class="text-right">
-                                    <a href="" class="btn btn-danger"> Remove</a>
-                                </td>
+                                <form action="{% url 'remove_cart_item' cart_item.product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <td class="text-right">
+                                        <button type="submit" action="submit" href="" class="btn btn-danger"> Remove</a>
+                                    </td>
+                                </form>
                             </tr>
                             {% endfor %}
-
                         </tbody>
                     </table>
                 </div> <!-- card.// -->
@@ -80,15 +90,17 @@
                     <div class="card-body">
                         <dl class="dlist-align">
                             <dt>Total price:</dt>
-                            <dd class="text-right">${{ total|intcomma }}</dd>
+                            <dd class="text-right">${{ total|floatformat:2|intcomma }}</dd>
                         </dl>
                         <dl class="dlist-align">
                             <dt>Tax:</dt>
-                            <dd class="text-right"> ${{ tax|intcomma }}</dd>
+                            <dd class="text-right"> ${{ tax|floatformat:2|intcomma }}</dd>
                         </dl>
                         <dl class="dlist-align">
                             <dt>Total:</dt>
-                            <dd class="text-right text-dark b"><strong>${{ grand_total|intcomma }}</strong></dd>
+                            <dd class="text-right text-dark b"><strong>
+                                    ${{ grand_total|floatformat:2|intcomma }}</strong>
+                            </dd>
                         </dl>
                         <hr>
                         <p class="text-center mb-3">
