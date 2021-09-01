@@ -4,7 +4,7 @@ from .views import StoreView, ProductView, SearchPage
 
 urlpatterns = [
     path(
-        "store/search/",
+        "search/",
         SearchPage.as_view(),
         name="search",
     ),

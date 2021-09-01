@@ -23,13 +23,21 @@ class StoreView(base.View):
                 "-modified_date"
             )
 
-        paginator = Paginator(products, 6)
+        PAGINATION_NUMBER = 6
+        paginator = Paginator(products, PAGINATION_NUMBER)
         page = request.GET.get("page")
         paged_products = paginator.get_page(page)
+        products_count = products.count()
+        if (products_count % PAGINATION_NUMBER) == 0:
+            last_page = PAGINATION_NUMBER
+        else:
+            last_page = products_count % PAGINATION_NUMBER
 
         context = {
             "products": paged_products,
-            "products_count": products.count(),
+            "paged": PAGINATION_NUMBER,
+            "last_page": last_page,
+            "products_count": products_count,
         }
         return render(request, "store/store.html", context)
 
