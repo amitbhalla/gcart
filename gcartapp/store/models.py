@@ -74,4 +74,4 @@ class Variation(models.Model):
         ordering = ["variation_value"]
 
     def __str__(self):
-        return str(self.product)
+        return str(self.variation_value)
