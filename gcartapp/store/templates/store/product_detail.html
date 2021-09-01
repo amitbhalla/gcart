@@ -66,6 +66,7 @@
                             </div>
                         </div> <!-- row.// -->
                         <hr>
+                        {% if not in_cart %}
                         {% if product.stock > 0 %}
                         <form action="{% url 'add_cart' product.id %}" method="POST">
                             {% csrf_token %}
@@ -76,6 +77,13 @@
                         </form>
                         {% else %}
                         <h4>Out of Stock</h4>
+                        {% endif %}
+                        {% else %}
+                        <button type="submit" action="submit" class="btn  btn-success">
+                            <span class="text">Added to Cart</span>
+                            <i class="fas fa-check"></i>
+                        </button>
+                        <a href="{% url 'cart' %}" class="btn  btn-primary">View Cart</a>
                         {% endif %}
 
                     </article> <!-- product-info-aside .// -->

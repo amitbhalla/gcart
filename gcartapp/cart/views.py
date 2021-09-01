@@ -90,5 +90,4 @@ class CartView(base.View):
             "tax": tax,
             "grand_total": grand_total,
         }
-        print(context)
         return render(request, "cart/cart.html", context)

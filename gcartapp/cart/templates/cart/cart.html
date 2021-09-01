@@ -6,14 +6,11 @@
 
 <section class="section-content padding-y bg">
     <div class="container">
-
         <!-- ============================ COMPONENT 1 ================================= -->
-
+        {% if cart_items %}
         <div class="row">
             <aside class="col-lg-9">
-                {% if cart_items %}
                 <div class="card">
-
                     <table class="table table-borderless table-shopping-cart">
                         <thead class="text-muted">
                             <tr class="small text-uppercase">
@@ -80,12 +77,8 @@
                         </tbody>
                     </table>
                 </div> <!-- card.// -->
-                {% else %}
-                <h2>Your Shopping Cart is Empty</h2>
-                {% endif %}
             </aside> <!-- col.// -->
             <aside class="col-lg-3">
-
                 <div class="card">
                     <div class="card-body">
                         <dl class="dlist-align">
@@ -107,16 +100,21 @@
                             <img src="{% static 'home/images/misc/payments.png' %}" height="26">
                         </p>
                         <a href="./place-order.html" class="btn btn-primary btn-block"> Checkout </a>
-                        <a href="./store.html" class="btn btn-light btn-block">Continue Shopping</a>
+                        <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
                     </div> <!-- card-body.// -->
                 </div> <!-- card.// -->
-
             </aside> <!-- col.// -->
-
-
         </div> <!-- row.// -->
         <!-- ============================ COMPONENT 1 END .// ================================= -->
-
+        {% else %}
+        <div class="text-center">
+            <br>
+            <br>
+            <h2>Your Shopping Cart is Empty</h2>
+            <br>
+            <a href="{% url 'store' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+        {% endif %}
     </div> <!-- container .//  -->
 </section>
 <!-- ========================= SECTION CONTENT END// ========================= -->

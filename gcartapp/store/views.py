@@ -3,6 +3,8 @@ from django.views.generic import base
 
 from store.models import Product
 from category.models import Category
+from cart.models import CartItem
+from cart.views import get_session_id
 
 
 class StoreView(base.View):
@@ -30,7 +32,13 @@ class ProductView(base.View):
         product = get_object_or_404(
             Product, category=category, slug=product_slug
         )
+        in_cart = CartItem.objects.filter(
+            cart__cart_id=get_session_id(request),
+            product__slug=product_slug,
+        ).exists()
+
         context = {
+            "in_cart": in_cart,
             "product": product,
         }
         return render(request, "store/product_detail.html", context)
