@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import base
+from django.core.paginator import Paginator
 
 from store.models import Product
 from category.models import Category
@@ -19,8 +20,13 @@ class StoreView(base.View):
             products = Product.objects.filter(is_available=True).order_by(
                 "-modified_date"
             )
+
+        paginator = Paginator(products, 6)
+        page = request.GET.get("page")
+        paged_products = paginator.get_page(page)
+
         context = {
-            "products": products,
+            "products": paged_products,
             "products_count": products.count(),
         }
         return render(request, "store/store.html", context)

@@ -140,31 +140,46 @@
                                         <span class="price">${{ product.price|floatformat:2|intcomma }}</span>
                                     </div> <!-- price-wrap.// -->
                                 </div>
-                                {% if product.stock > 0 %}
-                                <form action="{% url 'add_cart' product.id %}" method="POST">
-                                    {% csrf_token %}
-                                    <button type="submit" action="submit" class="btn btn-block btn-primary">
-                                        <span class="text">Add to Cart</span>
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </button>
-                                </form>
-                                {% else %}
-                                <h4>Out of Stock</h4>
-                                {% endif %}
+                                <a href="{{ product.get_url }}" class="btn btn-block btn-primary">
+                                    View Details
+                                </a>
                             </figcaption>
                         </figure>
                     </div> <!-- col.// -->
                     {% endfor %}
                 </div> <!-- row end.// -->
+                {% if products.has_other_pages %}
                 <nav class="mt-4" aria-label="Page navigation sample">
                     <ul class="pagination">
+                        <!-- Previous Button -->
+                        {% if products.has_previous %}
+                        <li class="page-item"><a class="page-link"
+                                href="?page={{ products.previous_page_number }}">Previous</a></li>
+                        {% else %}
                         <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        {% endif %}
+
+                        <!-- Page number button -->
+                        {% for i in products.paginator.page_range %}
+                        {% if products.number == i %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+
+
+                        <!-- next button -->
+                        {% if products.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">Next</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+                        {% endif %}
+
                     </ul>
                 </nav>
+                {% endif %}
 
             </main> <!-- col.// -->
 
