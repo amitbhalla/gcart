@@ -26,7 +26,7 @@ class AddCartView(base.View):
                     variation_value__iexact=value,
                 )
                 product_variation.append(variation)
-            except:
+            except Variation.DoesNotExist:
                 pass
 
         try:

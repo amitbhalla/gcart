@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import RegisterView, LoginView, LogoutView
+from .views import RegisterView, LoginView, LogoutView, ActivatePageView
 
 urlpatterns = [
     path(
@@ -17,5 +17,10 @@ urlpatterns = [
         "logout/",
         LogoutView.as_view(),
         name="logout",
+    ),
+    path(
+        "activate/<uidb64>/<token>/",
+        ActivatePageView.as_view(),
+        name="activate",
     ),
 ]
