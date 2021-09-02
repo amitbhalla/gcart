@@ -1,8 +1,7 @@
-from django.contrib import messages
+from django.contrib import messages, auth
 import shortuuid
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.generic import base
-from django.contrib.auth import get_user_model
 
 from .forms import RegistrationForm
 
@@ -29,7 +28,7 @@ class RegisterView(base.View):
                 + "-"
                 + shortuuid.ShortUUID().random(length=6).upper()
             )
-            user = get_user_model().objects.create_user(
+            user = auth.get_user_model().objects.create_user(
                 email=email,
                 password=password,
                 username=username,
@@ -53,8 +52,20 @@ class RegisterView(base.View):
 
 class LoginView(base.View):
     def get(self, request):
-        context = {}
         return render(request, "user/login.html")
+
+    def post(self, request):
+        email = request.POST["email"]
+        password = request.POST["password"]
+        user = auth.authenticate(email=email, password=password)
+
+        if user is not None:
+            auth.login(request, user)
+            # messages.success(request, "Login Successful!")
+            return redirect("home")
+        else:
+            messages.error(request, "Invalid Credentails!")
+            return redirect("login")
 
 
 class LogoutView(base.View):
