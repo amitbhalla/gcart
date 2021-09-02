@@ -2,6 +2,7 @@ import shortuuid
 from django.contrib import messages, auth
 from django.shortcuts import redirect, render
 from django.views.generic import base
+from django.urls import reverse
 
 # Verification email
 from django.contrib.sites.shortcuts import get_current_site
@@ -66,13 +67,9 @@ class RegisterView(base.View):
             send_email.send()
             #
 
-            messages.success(
-                request, "Registration Successful. Please check your email."
+            return redirect(
+                reverse("login") + "?command=verification&email=" + email
             )
-            context = {
-                "form": form,
-            }
-            return render(request, "user/register.html", context)
         else:
             context = {
                 "form": form,
