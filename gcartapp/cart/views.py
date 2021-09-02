@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import base
 
@@ -141,3 +142,43 @@ class CartView(base.View):
             "grand_total": grand_total,
         }
         return render(request, "cart/cart.html", context)
+
+
+class CheckoutView(base.View):
+    def get(
+        self,
+        request,
+        total=0.0,
+        quantity=0,
+        cart_items=None,
+        cart_item=None,
+        tax_percentage=0.02,
+        tax=0.0,
+        grand_total=0.0,
+    ):
+        if request.user.is_authenticated:
+            try:
+                cart = Cart.objects.get(cart_id=get_session_id(request))
+                cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+
+                for cart_item in cart_items:
+                    total += cart_item.product.price * cart_item.quantity
+                    quantity += cart_item.quantity
+
+                tax = total * tax_percentage
+                grand_total = total + tax
+
+            except (Cart.DoesNotExist, CartItem.DoesNotExist):
+                pass
+
+            context = {
+                "total": total,
+                "quantity": quantity,
+                "cart_items": cart_items,
+                "tax": tax,
+                "grand_total": grand_total,
+            }
+            return render(request, "cart/checkout.html", context)
+        else:
+            messages.error(request, "Please login to checkout.")
+            return redirect("login")
