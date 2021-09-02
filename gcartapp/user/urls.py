@@ -1,8 +1,22 @@
 from django.urls import path
 
-from .views import RegisterView, LoginView, LogoutView, ActivatePageView
+from .views import (
+    RegisterView,
+    LoginView,
+    LogoutView,
+    ActivatePageView,
+    DashboardView,
+    ForgotPasswordView,
+    ResetPasswordValidateView,
+    ResetPasswordView,
+)
 
 urlpatterns = [
+    path(
+        "dashboard/",
+        DashboardView.as_view(),
+        name="dashboard",
+    ),
     path(
         "register/",
         RegisterView.as_view(),
@@ -22,5 +36,25 @@ urlpatterns = [
         "activate/<uidb64>/<token>/",
         ActivatePageView.as_view(),
         name="activate",
+    ),
+    path(
+        "forgotpassword/",
+        ForgotPasswordView.as_view(),
+        name="forgotpassword",
+    ),
+    path(
+        "",
+        DashboardView.as_view(),
+        name="",
+    ),
+    path(
+        "resetpassword_validate/<uidb64>/<token>/",
+        ResetPasswordValidateView.as_view(),
+        name="resetpassword_validate",
+    ),
+    path(
+        "reset_password/",
+        ResetPasswordView.as_view(),
+        name="reset_password",
     ),
 ]

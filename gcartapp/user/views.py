@@ -13,7 +13,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
 from .forms import RegistrationForm
-from .models import User
 
 
 class RegisterView(base.View):
@@ -60,7 +59,7 @@ class RegisterView(base.View):
                 },
             )
             to_email = email
-            from_email = "Django@bcg.com"
+            from_email = "django@bcg.com"
             send_email = EmailMessage(
                 mail_subject, message, to=[to_email], from_email=from_email
             )
@@ -82,7 +81,12 @@ class ActivatePageView(base.View):
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
             user = auth.get_user_model()._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except (
+            TypeError,
+            ValueError,
+            OverflowError,
+            auth.get_user_model().DoesNotExist,
+        ):
             user = None
 
         if user is not None and default_token_generator.check_token(
@@ -110,8 +114,8 @@ class LoginView(base.View):
 
         if user is not None:
             auth.login(request, user)
-            # messages.success(request, "Login Successful!")
-            return redirect("home")
+            messages.success(request, "Login Successful!")
+            return redirect("dashboard")
         else:
             messages.error(request, "Invalid Credentails!")
             return redirect("login")
@@ -126,3 +130,91 @@ class LogoutView(base.View):
         else:
             messages.error(request, "You were not logged in!")
             return redirect("login")
+
+
+class DashboardView(base.View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return render(request, "user/dashboard.html")
+        else:
+            messages.error(request, "You were not logged in!")
+            return redirect("login")
+
+
+class ForgotPasswordView(base.View):
+    def get(self, request):
+        return render(request, "user/forgot_password.html")
+
+    def post(self, request):
+        email = request.POST["email"]
+        if auth.get_user_model().objects.filter(email=email).exists():
+            user = auth.get_user_model().objects.get(email__exact=email)
+            current_site = get_current_site(request)
+            mail_subject = "Reset Your Password"
+            message = render_to_string(
+                "user/reset_password_email.html",
+                {
+                    "user": user,
+                    "domain": current_site,
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "token": default_token_generator.make_token(user),
+                },
+            )
+            to_email = email
+            from_email = "django@bcg.com"
+            send_email = EmailMessage(
+                mail_subject, message, to=[to_email], from_email=from_email
+            )
+            send_email.send()
+
+            messages.success(
+                request,
+                "Password reset email has been sent to your email address.",
+            )
+            return redirect("login")
+        else:
+            messages.error(request, "Account does not exist!")
+            return redirect("forgotpassword")
+
+
+class ResetPasswordValidateView(base.View):
+    def get(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = auth.get_user_model()._default_manager.get(pk=uid)
+        except (
+            TypeError,
+            ValueError,
+            OverflowError,
+            auth.get_user_model().DoesNotExist,
+        ):
+            user = None
+
+        if user is not None and default_token_generator.check_token(
+            user, token
+        ):
+            request.session["uid"] = uid
+            messages.success(request, "Please reset your password.")
+            return redirect("reset_password")
+        else:
+            messages.error(request, "This link has expired!")
+            return redirect("login")
+
+
+class ResetPasswordView(base.View):
+    def post(self, request):
+        password = request.POST["password"]
+        confirm_password = request.POST["confirm_password"]
+        if password == confirm_password:
+            uid = request.session.get("uid")
+            user = auth.get_user_model().objects.get(pk=uid)
+            user.set_password(password)
+            user.save()
+            messages.success(request, "Password reset successful")
+            return redirect("login")
+        else:
+            messages.error(request, "Password do not match!")
+            return redirect("reset_password")
+
+    def get(self, request):
+        return render(request, "user/reset_password.html")
