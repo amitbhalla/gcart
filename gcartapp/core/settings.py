@@ -1,5 +1,6 @@
 from pathlib import Path
 import environ
+from django.contrib.messages import constants as messages
 
 env = environ.Env()
 environ.Env.read_env()
@@ -136,3 +137,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # first word "user" is the name of the app
 # second word "user" is the name of the model
 AUTH_USER_MODEL = "user.User"
+
+# For error messages
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+}

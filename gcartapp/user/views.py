@@ -1,3 +1,4 @@
+from django.contrib import messages
 import shortuuid
 from django.shortcuts import render
 from django.views.generic import base
@@ -36,6 +37,14 @@ class RegisterView(base.View):
                 last_name=last_name,
                 phone_number=phone_number,
             )
+            messages.success(
+                request, "Registration Successful. Please check your email."
+            )
+            context = {
+                "form": form,
+            }
+            return render(request, "user/register.html", context)
+        else:
             context = {
                 "form": form,
             }
