@@ -22,10 +22,13 @@
 ```
 asgiref==3.4.1
 black==21.8b0
+certifi==2021.5.30
+charset-normalizer==2.0.4
 click==8.0.1
 Django==3.2.6
 django-environ==0.4.5
 flake8==3.9.2
+idna==3.2
 mccabe==0.6.1
 mypy-extensions==0.4.3
 mysqlclient==2.0.3
@@ -35,11 +38,14 @@ platformdirs==2.2.0
 pycodestyle==2.7.0
 pyflakes==2.3.1
 pytz==2021.1
+razorpay==1.2.0
 regex==2021.8.28
+requests==2.26.0
 shortuuid==1.0.1
 sqlparse==0.4.1
 tomli==1.2.1
 typing-extensions==3.10.0.1
+urllib3==1.26.6
 ```
 
 7. Create docker-compose file in top directory

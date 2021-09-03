@@ -1,4 +1,5 @@
 import datetime as dt
+import razorpay
 from django.views.generic import base
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -7,6 +8,12 @@ from cart.models import CartItem
 from .forms import OrderForm
 from .models import Order
 from cart.views import TAX_PERCENTAGE
+
+
+def razorpay_setup(request):
+    client = razorpay.Client(auth=("YOUR_ID", "YOUR_SECRET"))
+    data = {"amount": 500, "currency": "INR", "receipt": "order_rcptid_11"}
+    payment = client.order.create(data=data)
 
 
 class PlaceOrderView(base.View):
