@@ -1,3 +1,4 @@
+from math import prod
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import base
@@ -37,16 +38,29 @@ class AddCartView(base.View):
             cart.save()
 
         # check if we have any cart items
-        is_exists_cart_item = CartItem.objects.filter(
-            product=product,
-            cart=cart,
-        ).exists()
-
-        if is_exists_cart_item:
-            cart_item = CartItem.objects.filter(
+        if request.user.is_authenticated:
+            is_exists_cart_item = CartItem.objects.filter(
+                product=product,
+                user=request.user,
+            ).exists()
+        else:
+            is_exists_cart_item = CartItem.objects.filter(
                 product=product,
                 cart=cart,
-            )
+            ).exists()
+
+        if is_exists_cart_item:
+
+            if request.user.is_authenticated:
+                cart_item = CartItem.objects.filter(
+                    product=product,
+                    user=request.user,
+                )
+            else:
+                cart_item = CartItem.objects.filter(
+                    product=product,
+                    cart=cart,
+                )
             existing_variation_list = []
             id_list = []
             for item in cart_item:
@@ -59,19 +73,36 @@ class AddCartView(base.View):
                 item_id = id_list[index]
                 item = CartItem.objects.get(product=product, id=item_id)
                 item.quantity += 1
+                if request.user.is_authenticated:
+                    item.user = request.user
                 item.save()
             else:
-                cart_item = CartItem.objects.create(
-                    product=product, quantity=1, cart=cart
-                )
+                if request.user.is_authenticated:
+                    cart_item = CartItem.objects.create(
+                        product=product,
+                        quantity=1,
+                        cart=cart,
+                        user=request.user,
+                    )
+                else:
+                    cart_item = CartItem.objects.create(
+                        product=product, quantity=1, cart=cart
+                    )
                 if len(product_variation) > 0:
                     cart_item.variations.clear()
                     cart_item.variations.add(*product_variation)
                 cart_item.save()
         else:
-            cart_item = CartItem.objects.create(
-                product=product, cart=cart, quantity=1
-            )
+            if request.user.is_authenticated:
+                cart_item = CartItem.objects.create(
+                    product=product, cart=cart, quantity=1, user=request.user
+                )
+            else:
+                cart_item = CartItem.objects.create(
+                    product=product,
+                    cart=cart,
+                    quantity=1,
+                )
             if len(product_variation) > 0:
                 cart_item.variations.clear()
                 cart_item.variations.add(*product_variation)
@@ -81,11 +112,16 @@ class AddCartView(base.View):
 
 class RemoveCartView(base.View):
     def post(self, request, product_id, cart_item_id):
-        cart = Cart.objects.get(cart_id=get_session_id(request))
         product = Product.objects.get(id=product_id)
-        cart_item = CartItem.objects.get(
-            cart=cart, product=product, id=cart_item_id
-        )
+        if request.user.is_authenticated:
+            cart_item = CartItem.objects.get(
+                user=request.user, product=product, id=cart_item_id
+            )
+        else:
+            cart = Cart.objects.get(cart_id=get_session_id(request))
+            cart_item = CartItem.objects.get(
+                cart=cart, product=product, id=cart_item_id
+            )
 
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
@@ -98,11 +134,16 @@ class RemoveCartView(base.View):
 
 class RemoveCartItemView(base.View):
     def post(self, request, product_id, cart_item_id):
-        cart = Cart.objects.get(cart_id=get_session_id(request))
         product = Product.objects.get(id=product_id)
-        cart_item = CartItem.objects.get(
-            cart=cart, product=product, id=cart_item_id
-        )
+        if request.user.is_authenticated:
+            cart_item = CartItem.objects.get(
+                user=request.user, product=product
+            )
+        else:
+            cart = Cart.objects.get(cart_id=get_session_id(request))
+            cart_item = CartItem.objects.get(
+                cart=cart, product=product, id=cart_item_id
+            )
         cart_item.delete()
         return redirect("cart")
 
@@ -121,8 +162,11 @@ class CartView(base.View):
     ):
 
         try:
-            cart = Cart.objects.get(cart_id=get_session_id(request))
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+            if request.user.is_authenticated:
+                cart_items = CartItem.objects.all().filter(user=request.user)
+            else:
+                cart = Cart.objects.get(cart_id=get_session_id(request))
+                cart_items = CartItem.objects.filter(cart=cart, is_active=True)
 
             for cart_item in cart_items:
                 total += cart_item.product.price * cart_item.quantity

@@ -47,6 +47,7 @@
                                             <form action="{% url 'remove_cart' cart_item.product.id cart_item.id %}"
                                                 method="POST">
                                                 {% csrf_token %}
+                                                <input type="hidden" name="user" value="{{ user.id }}">
                                                 <div class="input-group-prepend">
                                                     <button class="btn btn-light" type="submit" action="submit"
                                                         id="button-minus"> <i class="fa fa-minus"></i> </button>
@@ -59,6 +60,7 @@
                                                 <input type="hidden" name="{{ citem.variation_category|lower }}"
                                                     value="{{ citem.variation_value|capfirst }}">
                                                 {% endfor %}
+                                                <input type="hidden" name="user" value="{{ user.id }}">
                                                 <div class="input-group-append">
                                                     <button class="btn btn-light" type="submit" action="submit"
                                                         id="button-plus">
