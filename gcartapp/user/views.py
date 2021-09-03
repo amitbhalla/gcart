@@ -13,6 +13,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
 from .forms import RegistrationForm
+from cart.models import Cart, CartItem
+from cart.views import get_session_id
 
 
 class RegisterView(base.View):
@@ -113,6 +115,20 @@ class LoginView(base.View):
         user = auth.authenticate(email=email, password=password)
 
         if user is not None:
+            try:
+                cart = Cart.objects.get(cart_id=get_session_id(request))
+                is_exists_cart_item = CartItem.objects.filter(
+                    cart=cart
+                ).exists()
+                if is_exists_cart_item:
+                    cart_item = CartItem.objects.filter(cart=cart)
+                    for item in cart_item:
+                        item.user = user
+                        item.save()
+
+            except Cart.DoesNotExist:
+                pass
+
             auth.login(request, user)
             messages.success(request, "Login Successful!")
             return redirect("dashboard")

@@ -28,6 +28,7 @@ class CartAdmin(admin.ModelAdmin):
 class CartItemAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "user",
         "product",
         "quantity",
         "cart",
@@ -35,6 +36,7 @@ class CartItemAdmin(admin.ModelAdmin):
     )
     list_display_links = (
         "id",
+        "user",
         "product",
         "cart",
     )
