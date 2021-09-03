@@ -106,7 +106,8 @@
                         <p class="text-center mb-3">
                             <img src="{% static 'home/images/misc/payments.png' %}" height="26">
                         </p>
-                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Make Payment </a>
+                        <a href="{% url 'payments' order.order_number %}" class="btn btn-primary btn-block"> Make
+                            Payment </a>
                     </div> <!-- card-body.// -->
                 </div> <!-- card.// -->
             </aside> <!-- col.// -->

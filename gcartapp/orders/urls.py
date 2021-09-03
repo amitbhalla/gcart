@@ -9,7 +9,7 @@ urlpatterns = [
         name="place_order",
     ),
     path(
-        "payments/",
+        "payments/<str:order_number>/",
         PaymentsView.as_view(),
         name="payments",
     ),

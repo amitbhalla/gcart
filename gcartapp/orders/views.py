@@ -3,6 +3,8 @@ import razorpay
 from django.views.generic import base
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 
 from cart.models import CartItem
 from .forms import OrderForm
@@ -10,10 +12,20 @@ from .models import Order
 from cart.views import TAX_PERCENTAGE
 
 
-def razorpay_setup(request):
-    client = razorpay.Client(auth=("YOUR_ID", "YOUR_SECRET"))
-    data = {"amount": 500, "currency": "INR", "receipt": "order_rcptid_11"}
+def razorpay_setup(amount, currency, receipt):
+    client = razorpay.Client(
+        auth=(
+            settings.RAZORPAY_ID,
+            settings.RAZORPAY_SECRET,
+        )
+    )
+    data = {
+        "amount": amount,
+        "currency": currency,
+        "receipt": receipt,
+    }
     payment = client.order.create(data=data)
+    return payment
 
 
 class PlaceOrderView(base.View):
@@ -83,5 +95,22 @@ class PlaceOrderView(base.View):
 
 
 class PaymentsView(base.View):
-    def get(self, request):
-        return render(request, "orders/payments.html")
+    def get(self, request, order_number):
+        order = Order.objects.get(order_number=order_number)
+        amount = int(order.order_total) * 100
+        currency = "INR"
+        receipt = str(order.order_number)
+        payment = razorpay_setup(amount, currency, receipt)
+        context = {
+            "key": settings.RAZORPAY_ID,
+            "amount": payment["amount"],
+            "currency": payment["currency"],
+            "name": order.full_name,
+            "description": order.order_note,
+            "image": get_current_site(request),
+            "order_id": payment["id"],
+            "email": order.email,
+            "contact": order.phone,
+            "address": order.full_address,
+        }
+        return render(request, "orders/razorpay.html", context)
