@@ -19,7 +19,6 @@ from cart.views import get_session_id
 
 class RegisterView(base.View):
     def get(self, request):
-
         form = RegistrationForm()
         context = {
             "form": form,
@@ -131,7 +130,15 @@ class LoginView(base.View):
 
             auth.login(request, user)
             messages.success(request, "Login Successful!")
-            return redirect("dashboard")
+
+            try:
+                cart_items = CartItem.objects.all().filter(user=request.user)
+                if cart_items:
+                    return redirect("cart")
+                else:
+                    return redirect("dashboard")
+            except CartItem.DoesNotExist:
+                return redirect("dashboard")
         else:
             messages.error(request, "Invalid Credentails!")
             return redirect("login")

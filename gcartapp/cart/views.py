@@ -37,7 +37,6 @@ class AddCartView(base.View):
             cart = Cart.objects.create(cart_id=get_session_id(request))
             cart.save()
 
-        # check if we have any cart items
         if request.user.is_authenticated:
             is_exists_cart_item = CartItem.objects.filter(
                 product=product,
@@ -202,9 +201,9 @@ class CheckoutView(base.View):
     ):
         if request.user.is_authenticated:
             try:
-                cart = Cart.objects.get(cart_id=get_session_id(request))
-                cart_items = CartItem.objects.filter(cart=cart, is_active=True)
-
+                cart_items = CartItem.objects.filter(
+                    user=request.user, is_active=True
+                )
                 for cart_item in cart_items:
                     total += cart_item.product.price * cart_item.quantity
                     quantity += cart_item.quantity
