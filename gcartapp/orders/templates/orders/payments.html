@@ -5,66 +5,38 @@
 <section class="section-content padding-y bg">
     <div class="container">
         <!-- ============================ COMPONENT 1 ================================= -->
+        <h4 class="text-center mb-20">Review your Order</h4>
         <div class="row">
-            <aside class="col-lg-6">
+            <aside class="col-lg-7">
                 <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title mb-4">Billing Address</h4>
-                        <form action="{% url 'place_order' %}" method="POST">
-                            {% csrf_token %}
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">First Name</label>
-                                    <input type="text" name="first_name" class="form-control" required>
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Last Name</label>
-                                    <input type="text" name="last_name" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">Email</label>
-                                    <input type="email" name="email" class="form-control" required>
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">Address Line 1</label>
-                                    <input type="text" name="address_line_1" class="form-control" required>
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Address Line 2</label>
-                                    <input type="text" name="address_line_2" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="col form-group">
-                                    <label for="">City</label>
-                                    <input type="text" name="city" class="form-control" required>
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">State</label>
-                                    <input type="text" name="state" class="form-control" required>
-                                </div>
-                                <div class="col form-group">
-                                    <label for="">Country</label>
-                                    <input type="text" name="country" class="form-control" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <label for="">Order Note</label>
-                                <textarea name="order_note" rows="2" class="form-control"></textarea>
-                            </div>
+                    <div class="card-header">
+                        <h5 class="card-title">Billing Address</h5>
                     </div>
-                </div> <!-- card.// -->
-            </aside> <!-- col.// -->
-            <aside class="col-lg-6">
+                    <div class="card-body">
+                        <p class="card-text mb-0">{{ order.full_name }}</p>
+                        <p class="card-text mb-0">{{ order.full_address }}.</p>
+                        <p class="card-text mb-0">{{ order.city }}, {{ order.state }}, {{ order.country }}.
+                        </p>
+                        <p class="card-text mb-0">{{ order.phone }} - {{ order.email }}</p>
+                        {% if order.order_note %}
+                        <p class="card-text mb-0"><b>Order Note:</b> - {{ order.order_note }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <br>
                 <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Payment Method</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">PayPal</p>
+                    </div>
+                </div>
+                <br>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Review Products</h5>
+                    </div>
                     <div class="card-body">
                         <table class="table table-borderless table-shopping-cart">
                             <thead class="text-muted">
@@ -110,9 +82,31 @@
                                 {% endfor %}
                             </tbody>
                         </table>
-                        <button type="submit" name="submit" class="btn btn-primary btn-block">Place Order</button>
-                        <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
-                        </form>
+                    </div>
+                </div>
+            </aside> <!-- col.// -->
+            <aside class="col-lg-5">
+                <div class="card">
+                    <div class="card-body">
+                        <dl class="dlist-align">
+                            <dt>Total price:</dt>
+                            <dd class="text-right">${{ total|floatformat:2|intcomma }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Tax:</dt>
+                            <dd class="text-right"> ${{ tax|floatformat:2|intcomma }}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Total:</dt>
+                            <dd class="text-right text-dark b"><strong>
+                                    ${{ grand_total|floatformat:2|intcomma }}</strong>
+                            </dd>
+                        </dl>
+                        <hr>
+                        <p class="text-center mb-3">
+                            <img src="{% static 'home/images/misc/payments.png' %}" height="26">
+                        </p>
+                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-block"> Make Payment </a>
                     </div> <!-- card-body.// -->
                 </div> <!-- card.// -->
             </aside> <!-- col.// -->
@@ -121,4 +115,4 @@
     </div> <!-- container .//  -->
 </section>
 <!-- ========================= SECTION CONTENT END// ========================= -->
-{% endblock %}
+{% endblock content %}

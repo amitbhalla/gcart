@@ -1,5 +1,4 @@
 import datetime as dt
-import uuid
 from django.views.generic import base
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -58,7 +57,15 @@ class PlaceOrderView(base.View):
                     data.tax = tax
                     data.ip = request.META.get("REMOTE_ADDR")
                     data.save()
-                    return redirect("checkout")
+
+                    context = {
+                        "order": data,
+                        "cart_items": cart_items,
+                        "total": total,
+                        "tax": tax,
+                        "grand_total": grand_total,
+                    }
+                    return render(request, "orders/payments.html", context)
             else:
                 return redirect("store")
         else:
@@ -66,3 +73,8 @@ class PlaceOrderView(base.View):
                 request, "You need to login to perform this action."
             )
             return redirect("login")
+
+
+class PaymentsView(base.View):
+    def get(self, request):
+        return render(request, "orders/payments.html")
