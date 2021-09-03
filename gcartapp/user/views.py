@@ -60,7 +60,7 @@ class RegisterView(base.View):
                 },
             )
             to_email = email
-            from_email = "django@bcg.com"
+            from_email = "django@test.com"
             send_email = EmailMessage(
                 mail_subject, message, to=[to_email], from_email=from_email
             )
@@ -184,7 +184,7 @@ class ForgotPasswordView(base.View):
                 },
             )
             to_email = email
-            from_email = "django@bcg.com"
+            from_email = "django@test.com"
             send_email = EmailMessage(
                 mail_subject, message, to=[to_email], from_email=from_email
             )
