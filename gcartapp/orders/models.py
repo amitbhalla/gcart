@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 
@@ -31,7 +32,7 @@ class Order(models.Model):
     payment = models.ForeignKey(
         Payment, on_delete=models.SET_NULL, blank=True, null=True
     )
-    order_number = models.CharField(max_length=255)
+    order_number = models.UUIDField(default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
@@ -41,7 +42,7 @@ class Order(models.Model):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
-    order_note = models.CharField(max_length=255, blank=True)
+    order_note = models.TextField(blank=True)
     order_total = models.FloatField()
     tax = models.FloatField()
     status = models.CharField(max_length=10, choices=STATUS, default="New")
@@ -51,7 +52,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.order_number
+        return str(self.order_number)
 
 
 class OrderProduct(models.Model):

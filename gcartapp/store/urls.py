@@ -1,11 +1,11 @@
 from django.urls import path
 
-from .views import StoreView, ProductView, SearchPage
+from .views import StoreView, ProductView, SearchPageView
 
 urlpatterns = [
     path(
         "search/",
-        SearchPage.as_view(),
+        SearchPageView.as_view(),
         name="search",
     ),
     path(

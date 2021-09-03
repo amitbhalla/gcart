@@ -1,10 +1,11 @@
-from math import prod
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import base
 
 from store.models import Product, Variation
 from .models import Cart, CartItem
+
+TAX_PERCENTAGE = 0.02
 
 
 def get_session_id(request):
@@ -135,8 +136,8 @@ class RemoveCartItemView(base.View):
     def post(self, request, product_id, cart_item_id):
         product = Product.objects.get(id=product_id)
         if request.user.is_authenticated:
-            cart_item = CartItem.objects.get(
-                user=request.user, product=product
+            cart_item = CartItem.objects.filter(
+                user=request.user, product=product, id=cart_item_id
             )
         else:
             cart = Cart.objects.get(cart_id=get_session_id(request))
@@ -155,7 +156,6 @@ class CartView(base.View):
         quantity=0,
         cart_items=None,
         cart_item=None,
-        tax_percentage=0.02,
         tax=0.0,
         grand_total=0.0,
     ):
@@ -171,7 +171,7 @@ class CartView(base.View):
                 total += cart_item.product.price * cart_item.quantity
                 quantity += cart_item.quantity
 
-            tax = total * tax_percentage
+            tax = total * TAX_PERCENTAGE
             grand_total = total + tax
 
         except (Cart.DoesNotExist, CartItem.DoesNotExist):

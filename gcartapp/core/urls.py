@@ -21,6 +21,10 @@ urlpatterns = [
         include("user.urls"),
     ),
     path(
+        "orders/",
+        include("orders.urls"),
+    ),
+    path(
         "",
         include("home.urls"),
     ),

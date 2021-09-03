@@ -34,9 +34,9 @@ class PaymentAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "order_number",
         "user",
         "payment",
-        "order_number",
         "email",
         "order_total",
         "status",
@@ -45,6 +45,7 @@ class OrderAdmin(admin.ModelAdmin):
     )
     list_display_links = (
         "id",
+        "order_number",
         "user",
         "payment",
     )
@@ -57,7 +58,10 @@ class OrderAdmin(admin.ModelAdmin):
     ordering = [
         "id",
     ]
-    readonly_fields = ("id",)
+    readonly_fields = (
+        "id",
+        "order_number",
+    )
 
 
 @admin.register(OrderProduct)

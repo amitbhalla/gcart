@@ -53,7 +53,7 @@ class ProductView(base.View):
         return render(request, "store/product_detail.html", context)
 
 
-class SearchPage(base.View):
+class SearchPageView(base.View):
     def get(self, request):
 
         products = []
