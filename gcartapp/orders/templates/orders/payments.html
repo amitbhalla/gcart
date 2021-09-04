@@ -127,7 +127,7 @@
                             };
                             var url = "{% url 'payments' %}";
                             var csrftoken = getCookie('csrftoken');
-                            var order_id = "{{ order_id }}";
+                            var order_number = "{{ order_number }}";
                             var paymentMethod = "{{ payment_method }}";
                             var options = {
                                 "key": "{{ key }}", // Enter the Key ID generated from the Dashboard
@@ -154,7 +154,8 @@
                                                 orderID: response.razorpay_order_id,
                                                 transID: response.razorpay_payment_id,
                                                 signature: response.razorpay_signature,
-                                                payment_method: paymentMethod,
+                                                paymentMethod: paymentMethod,
+                                                order: order_number,
                                                 status: "Completed",
                                             }),
                                         })

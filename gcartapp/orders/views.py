@@ -9,7 +9,7 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from cart.models import CartItem
 from .forms import OrderForm
-from .models import Order
+from .models import Order, Payment
 from cart.views import TAX_PERCENTAGE
 
 
@@ -76,6 +76,7 @@ class PlaceOrderView(base.View):
                     data.order_total = grand_total
                     data.tax = tax
                     data.ip = request.META.get("REMOTE_ADDR")
+                    data.user = request.user
                     data.save()
                     amount = int(data.order_total) * 100
                     currency = "INR"
@@ -99,6 +100,7 @@ class PlaceOrderView(base.View):
                         "contact": data.phone,
                         "address": data.full_address,
                         "payment_method": "RazorPay",
+                        "order_number": data.order_number,
                     }
                     return render(request, "orders/payments.html", context)
             else:
@@ -114,6 +116,24 @@ class PaymentsView(base.View):
     def post(self, request):
         body = json.loads(request.body)
         print("*" * 100)
-        print(body)
+        print(body["order"])
         print("*" * 100)
-        return
+        try:
+            order = Order.objects.get(
+                user=request.user, is_ordered=False, order_number=body["order"]
+            )
+        except:
+            pass
+        print("*" * 100)
+        print(order.order_total)
+        print("*" * 100)
+        payment = Payment.objects.create(
+            user=request.user,
+            payment_id=body["transID"],
+            payment_method=body["paymentMethod"],
+            amount_paid=order.order_total,
+            status=body["status"],
+            signature=body["signature"],
+            signature_code=body["orderID"],
+        )
+        payment.save()
