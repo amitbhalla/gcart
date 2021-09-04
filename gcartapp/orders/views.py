@@ -76,6 +76,10 @@ class PlaceOrderView(base.View):
                     data.tax = tax
                     data.ip = request.META.get("REMOTE_ADDR")
                     data.save()
+                    amount = int(data.order_total) * 100
+                    currency = "INR"
+                    receipt = str(data.order_number)
+                    payment = razorpay_setup(amount, currency, receipt)
 
                     context = {
                         "order": data,
@@ -83,6 +87,16 @@ class PlaceOrderView(base.View):
                         "total": total,
                         "tax": tax,
                         "grand_total": grand_total,
+                        "key": settings.RAZORPAY_ID,
+                        "amount": payment["amount"],
+                        "currency": payment["currency"],
+                        "name": data.full_name,
+                        "description": data.order_note,
+                        "image": get_current_site(request),
+                        "order_id": payment["id"],
+                        "email": data.email,
+                        "contact": data.phone,
+                        "address": data.full_address,
                     }
                     return render(request, "orders/payments.html", context)
             else:
@@ -96,21 +110,4 @@ class PlaceOrderView(base.View):
 
 class PaymentsView(base.View):
     def get(self, request, order_number):
-        order = Order.objects.get(order_number=order_number)
-        amount = int(order.order_total) * 100
-        currency = "INR"
-        receipt = str(order.order_number)
-        payment = razorpay_setup(amount, currency, receipt)
-        context = {
-            "key": settings.RAZORPAY_ID,
-            "amount": payment["amount"],
-            "currency": payment["currency"],
-            "name": order.full_name,
-            "description": order.order_note,
-            "image": get_current_site(request),
-            "order_id": payment["id"],
-            "email": order.email,
-            "contact": order.phone,
-            "address": order.full_address,
-        }
-        return render(request, "orders/razorpay.html", context)
+        pass
