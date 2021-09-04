@@ -160,7 +160,8 @@ class CartView(base.View):
         grand_total=0.0,
     ):
 
-        if request.GET["command"] == "payment-failed":
+        cmd = request.GET.get("command", False)
+        if cmd:
             messages.error(
                 request,
                 "Payment Failed",

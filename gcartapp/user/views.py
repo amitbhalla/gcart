@@ -3,6 +3,7 @@ from django.contrib import messages, auth
 from django.shortcuts import redirect, render
 from django.views.generic import base
 from django.urls import reverse
+from django.conf import settings
 
 # Verification email
 from django.contrib.sites.shortcuts import get_current_site
@@ -60,7 +61,7 @@ class RegisterView(base.View):
                 },
             )
             to_email = email
-            from_email = "django@test.com"
+            from_email = settings.SENDER_EMAIL
             send_email = EmailMessage(
                 mail_subject, message, to=[to_email], from_email=from_email
             )
@@ -184,7 +185,7 @@ class ForgotPasswordView(base.View):
                 },
             )
             to_email = email
-            from_email = "django@test.com"
+            from_email = settings.SENDER_EMAIL
             send_email = EmailMessage(
                 mail_subject, message, to=[to_email], from_email=from_email
             )

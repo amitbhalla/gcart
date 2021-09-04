@@ -72,7 +72,7 @@ class OrderProduct(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    variation = models.ForeignKey(Variation, on_delete=models.CASCADE)
+    variations = models.ManyToManyField(Variation, blank=True)
     color = models.CharField(max_length=255)
     size = models.CharField(max_length=255)
     quantity = models.IntegerField()

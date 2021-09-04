@@ -130,6 +130,7 @@
                             var order_number = "{{ order_number }}";
                             var paymentMethod = "{{ payment_method }}";
                             var fail_url = "{% url 'cart' %}"
+                            var redirect_url = "{% url 'order_complete' %}"
                             var options = {
                                 "key": "{{ key }}", // Enter the Key ID generated from the Dashboard
                                 "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
@@ -160,6 +161,10 @@
                                                 status: "Completed",
                                             }),
                                         })
+                                            .then((response) => response.json())
+                                            .then((data) => {
+                                                window.location.href = redirect_url + '?order_number=' + data.order_number + '&payment_id=' + data.transID;
+                                            });
                                     }
                                     sendData();
                                 },
