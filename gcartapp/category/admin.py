@@ -1,6 +1,12 @@
 from django.contrib import admin
 
 from .models import Category
+from store.models import Product
+
+
+class ProductInline(admin.TabularInline):
+    model = Product
+    extra = 0
 
 
 @admin.register(Category)
@@ -24,3 +30,6 @@ class CategoryAdmin(admin.ModelAdmin):
         "id",
     ]
     readonly_fields = ("id",)
+    inlines = [
+        ProductInline,
+    ]

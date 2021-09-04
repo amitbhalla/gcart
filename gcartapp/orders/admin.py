@@ -30,6 +30,11 @@ class PaymentAdmin(admin.ModelAdmin):
     readonly_fields = ("id",)
 
 
+class OrderProductInline(admin.TabularInline):
+    model = OrderProduct
+    extra = 0
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
@@ -62,6 +67,10 @@ class OrderAdmin(admin.ModelAdmin):
         "id",
         "order_number",
     )
+    inlines = [
+        OrderProductInline,
+    ]
+    list_per_page = 20
 
 
 @admin.register(OrderProduct)

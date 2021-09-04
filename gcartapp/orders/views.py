@@ -40,8 +40,6 @@ class PlaceOrderView(base.View):
             cart_count = cart_items.count()
             if cart_count == 0:
                 return redirect("store")
-            else:
-                pass
         else:
             messages.error(
                 request, "You need to login to perform this action."
@@ -142,6 +140,8 @@ class PaymentsView(base.View):
             cart_items = CartItem.objects.filter(user=request.user)
 
             for item in cart_items:
+                #
+                # Move cart items to Order Product
                 orderproduct = OrderProduct()
                 orderproduct.order_id = order.id
                 orderproduct.payment = payment
@@ -151,19 +151,20 @@ class PaymentsView(base.View):
                 orderproduct.product_price = item.product.price
                 orderproduct.ordered = True
                 orderproduct.save()
-
+                #
+                # Save Variations
                 cart_item = CartItem.objects.get(id=item.id)
                 product_variation = cart_item.variations.all()
                 orderproduct = OrderProduct.objects.get(id=orderproduct.id)
                 orderproduct.variations.set(product_variation)
                 orderproduct.save()
-
+                #
                 # Reduce the quantity of the sold products
                 product = Product.objects.get(id=item.product_id)
                 product.stock -= item.quantity
                 product.save()
 
-            # Clear cart
+            # Clear Cart
             CartItem.objects.filter(user=request.user).delete()
 
             # Send order recieved email to customer
@@ -194,13 +195,11 @@ class OrderCompleteView(base.View):
     def get(self, request):
         order_number = request.GET.get("order_number")
         transID = request.GET.get("payment_id")
-
         try:
             order = Order.objects.get(
                 order_number=order_number, is_ordered=True
             )
             ordered_products = OrderProduct.objects.filter(order_id=order.id)
-
             subtotal = 0
             for i in ordered_products:
                 subtotal += i.product_price * i.quantity
