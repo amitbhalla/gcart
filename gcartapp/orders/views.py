@@ -1,5 +1,6 @@
 import datetime as dt
 import razorpay
+import json
 from django.views.generic import base
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -92,11 +93,12 @@ class PlaceOrderView(base.View):
                         "currency": payment["currency"],
                         "name": data.full_name,
                         "description": data.order_note,
-                        "image": get_current_site(request),
+                        "image": "",
                         "order_id": payment["id"],
                         "email": data.email,
                         "contact": data.phone,
                         "address": data.full_address,
+                        "payment_method": "RazorPay",
                     }
                     return render(request, "orders/payments.html", context)
             else:
@@ -109,5 +111,9 @@ class PlaceOrderView(base.View):
 
 
 class PaymentsView(base.View):
-    def get(self, request, order_number):
-        pass
+    def post(self, request):
+        body = json.loads(request.body)
+        print("*" * 100)
+        print(body)
+        print("*" * 100)
+        return
