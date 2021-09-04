@@ -129,6 +129,7 @@
                             var csrftoken = getCookie('csrftoken');
                             var order_number = "{{ order_number }}";
                             var paymentMethod = "{{ payment_method }}";
+                            var fail_url = "{% url 'cart' %}"
                             var options = {
                                 "key": "{{ key }}", // Enter the Key ID generated from the Dashboard
                                 "amount": "{{ amount }}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
@@ -181,6 +182,22 @@
                                 console.log(response.error.reason);
                                 console.log(response.error.metadata.order_id);
                                 console.log(response.error.metadata.payment_id);
+                                function failData() {
+                                    fetch(url, {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "X-CSRFToken": csrftoken,
+                                        },
+                                        body: JSON.stringify({
+                                            status: "Failed",
+                                        }),
+                                    })
+                                        .then((data) => {
+                                            window.location.href = fail_url + "?command=payment-failed";
+                                        });
+                                }
+                                failData();
                             });
                             document.getElementById('rzp-button1').onclick = function (e) {
                                 rzp1.open();

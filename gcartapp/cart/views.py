@@ -160,6 +160,12 @@ class CartView(base.View):
         grand_total=0.0,
     ):
 
+        if request.GET["command"] == "payment-failed":
+            messages.error(
+                request,
+                "Payment Failed",
+            )
+
         try:
             if request.user.is_authenticated:
                 cart_items = CartItem.objects.all().filter(user=request.user)
@@ -223,5 +229,8 @@ class CheckoutView(base.View):
             }
             return render(request, "cart/checkout.html", context)
         else:
-            messages.error(request, "Please login to checkout.")
+            messages.error(
+                request,
+                "Please login to checkout.",
+            )
             return redirect("login")

@@ -115,25 +115,22 @@ class PlaceOrderView(base.View):
 class PaymentsView(base.View):
     def post(self, request):
         body = json.loads(request.body)
-        print("*" * 100)
-        print(body["order"])
-        print("*" * 100)
-        try:
+
+        if body["status"] == "Completed":
             order = Order.objects.get(
                 user=request.user, is_ordered=False, order_number=body["order"]
             )
-        except:
-            pass
-        print("*" * 100)
-        print(order.order_total)
-        print("*" * 100)
-        payment = Payment.objects.create(
-            user=request.user,
-            payment_id=body["transID"],
-            payment_method=body["paymentMethod"],
-            amount_paid=order.order_total,
-            status=body["status"],
-            signature=body["signature"],
-            signature_code=body["orderID"],
-        )
-        payment.save()
+            payment = Payment.objects.create(
+                user=request.user,
+                payment_id=body["transID"],
+                payment_method=body["paymentMethod"],
+                amount_paid=order.order_total,
+                status=body["status"],
+                signature=body["signature"],
+                signature_code=body["orderID"],
+            )
+            payment.save()
+            order.payment = payment
+            order.status = body["status"]
+            order.is_ordered = True
+            order.save()
