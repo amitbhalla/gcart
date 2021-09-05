@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Product, Variation
+from .models import Product, Variation, ReviewRating
 
 
 @admin.register(Product)
@@ -56,6 +56,39 @@ class VariationAdmin(admin.ModelAdmin):
     list_filter = [
         "is_active",
         "product",
+    ]
+    ordering = [
+        "id",
+    ]
+    readonly_fields = ("id",)
+
+
+@admin.register(ReviewRating)
+class ReviewRatingAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "product",
+        "user",
+        "subject",
+        "review",
+        "rating",
+        "ip",
+        "status",
+    )
+    list_display_links = (
+        "id",
+        "product",
+        "user",
+    )
+    list_editable = [
+        "subject",
+        "rating",
+        "status",
+    ]
+    list_filter = [
+        "status",
+        "product",
+        "user",
     ]
     ordering = [
         "id",
