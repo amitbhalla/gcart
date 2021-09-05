@@ -16,6 +16,7 @@ from django.core.mail import EmailMessage
 from .forms import RegistrationForm
 from cart.models import Cart, CartItem
 from cart.views import get_session_id
+from .tasks import send_mail_task
 
 
 class RegisterView(base.View):
@@ -62,10 +63,11 @@ class RegisterView(base.View):
             )
             to_email = email
             from_email = settings.SENDER_EMAIL
-            send_email = EmailMessage(
-                mail_subject, message, to=[to_email], from_email=from_email
-            )
-            send_email.send()
+            # send_email = EmailMessage(
+            #     mail_subject, message, to=[to_email], from_email=from_email
+            # )
+            # send_email.send()
+            send_mail_task.delay(mail_subject, message, to_email, from_email)
             #
 
             return redirect(

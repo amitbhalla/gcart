@@ -20,32 +20,44 @@
 ### Requirements.txt
 
 ```
+amqp==5.0.6
 asgiref==3.4.1
+billiard==3.6.4.0
 black==21.8b0
+celery==5.1.2
 certifi==2021.5.30
 charset-normalizer==2.0.4
-click==8.0.1
+click==7.1.2
+click-didyoumean==0.0.3
+click-plugins==1.1.1
+click-repl==0.2.0
 Django==3.2.6
 django-environ==0.4.5
 flake8==3.9.2
 idna==3.2
+kombu==5.1.0
 mccabe==0.6.1
 mypy-extensions==0.4.3
 mysqlclient==2.0.3
 pathspec==0.9.0
 Pillow==8.3.1
 platformdirs==2.2.0
+prompt-toolkit==3.0.20
 pycodestyle==2.7.0
 pyflakes==2.3.1
 pytz==2021.1
 razorpay==1.2.0
+redis==3.5.3
 regex==2021.8.28
 requests==2.26.0
 shortuuid==1.0.1
+six==1.16.0
 sqlparse==0.4.1
 tomli==1.2.1
 typing-extensions==3.10.0.1
 urllib3==1.26.6
+vine==5.0.0
+wcwidth==0.2.5
 ```
 
 7. Create docker-compose file in top directory
@@ -70,6 +82,9 @@ services:
       sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - mysql
+      - redis
+    links:
+      - redis
   mysql:
     image: mysql:8.0
     volumes:
@@ -84,6 +99,19 @@ services:
       - mysql
     ports:
       - 8080:80
+  redis:
+    image: redis:6
+    container_name: redis
+  celery:
+    build:
+      context: .
+      dockerfile: gcartapp/gcartapp.dockerfile
+    volumes:
+      - ./gcartapp:/gcartapp
+    container_name: cl01
+    command: celery -A core worker -l info
+    links:
+      - redis
 
 volumes:
   data:

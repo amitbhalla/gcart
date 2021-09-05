@@ -14,6 +14,7 @@ from store.models import Product
 from .forms import OrderForm
 from .models import Order, Payment, OrderProduct
 from cart.views import TAX_PERCENTAGE
+from user.tasks import send_mail_task
 
 
 def razorpay_setup(amount, currency, receipt):
@@ -178,10 +179,11 @@ class PaymentsView(base.View):
             )
             to_email = request.user.email
             from_email = settings.SENDER_EMAIL
-            send_email = EmailMessage(
-                mail_subject, message, to=[to_email], from_email=from_email
-            )
-            send_email.send()
+            # send_email = EmailMessage(
+            #     mail_subject, message, to=[to_email], from_email=from_email
+            # )
+            # send_email.send()
+            send_mail_task.delay(mail_subject, message, to_email, from_email)
 
             # Send order number and transaction id back to sendData method via JsonResponse
             data = {
