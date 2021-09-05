@@ -4,9 +4,7 @@ from django.views.generic import base
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from django.http import JsonResponse
-from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 
 from cart.models import CartItem
@@ -179,13 +177,8 @@ class PaymentsView(base.View):
             )
             to_email = request.user.email
             from_email = settings.SENDER_EMAIL
-            # send_email = EmailMessage(
-            #     mail_subject, message, to=[to_email], from_email=from_email
-            # )
-            # send_email.send()
             send_mail_task.delay(mail_subject, message, to_email, from_email)
 
-            # Send order number and transaction id back to sendData method via JsonResponse
             data = {
                 "order_number": order.order_number,
                 "transID": payment.payment_id,
