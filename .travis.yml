@@ -1,11 +1,28 @@
 language: python
+
 python:
   - "3.9"
 
 services:
   - docker
 
+before_install:
+  - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+  - sudo apt-get install python-dev
+  - sudo apt-get install libjpeg-dev
+  - sudo apt-get install libjpeg8-dev
+  - sudo apt-get install libpng3
+  - sudo apt-get install libfreetype6-dev
+  - sudo ln -s /usr/lib/i386-linux-gnu/libfreetype.so /usr/lib
+  - sudo ln -s /usr/lib/i386-linux-gnu/libjpeg.so /usr/lib
+  - sudo ln -s /usr/lib/i386-linux-gnu/libz.so /usr/lib
+  - sudo pip install Pillow
+  - sudo pip install -r requirements.txt
+
 before_script: pip install docker-compose
 
 script:
   - docker-compose run app sh -c "python manage.py wait_for_db && python manage.py test && flake8"
+
+notifications:
+  email: false
