@@ -142,6 +142,9 @@ celerybeat.pid
 pyenv
 .vscode
 .env
+data
+*.env
+db.env
 
 # Spyder project settings
 .spyderproject

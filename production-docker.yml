@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  gcartapp:
+    build:
+      context: .
+      dockerfile: gcartapp/gcartapp.dockerfile
+    volumes:
+      - ./gcartapp:/gcartapp
+      - ./gcartapp/container/media:/vol/web/media
+      - ./gcartapp/container/static:/vol/web/static
+    ports:
+      - 8000:8000
+    command: >
+      sh -c "
+      python manage.py wait_for_db &&
+      python manage.py makemigrations &&
+      python manage.py migrate && 
+      python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - redis
+    links:
+      - redis
+
+  redis:
+    image: redis:6
+    container_name: redis
+
+  celery:
+    build:
+      context: .
+      dockerfile: gcartapp/gcartapp.dockerfile
+    volumes:
+      - ./gcartapp:/gcartapp
+    container_name: cl01
+    command: celery -A core worker -l info
+    links:
+      - redis
+
+networks:
+  default:
+    external:
+      name: box-net
