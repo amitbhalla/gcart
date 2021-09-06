@@ -62,7 +62,7 @@ wcwidth==0.2.5
 
 7. Create docker-compose file in top directory
 
-### docker-compose.yml
+### local-docker.yml
 
 ```
 version: "3.8"
@@ -79,29 +79,37 @@ services:
     ports:
       - 8000:8000
     command: >
-      sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+      sh -c "
+      python manage.py wait_for_db &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
     depends_on:
-      - mysql
+      - db
       - redis
     links:
       - redis
-  mysql:
+
+  db:
     image: mysql:8.0
     volumes:
-      - data:/var/lib/mysql
+      - ./data:/var/lib/mysql
     env_file:
       - db/db.env
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
-      - PMA_HOST=mysql
+      - PMA_HOST=db
     depends_on:
-      - mysql
+      - db
     ports:
       - 8080:80
+
   redis:
     image: redis:6
     container_name: redis
+
   celery:
     build:
       context: .
@@ -113,8 +121,59 @@ services:
     links:
       - redis
 
-volumes:
-  data:
+networks:
+  default:
+    external:
+      name: box-net
+
+```
+
+### production-docker.yml
+
+```
+version: "3"
+
+services:
+  gcartapp:
+    build:
+      context: .
+      dockerfile: gcartapp/gcartapp.dockerfile
+    volumes:
+      - ./gcartapp:/gcartapp
+      - ./gcartapp/container/media:/vol/web/media
+      - ./gcartapp/container/static:/vol/web/static
+    ports:
+      - 8000:8000
+    command: >
+      sh -c "
+      python manage.py wait_for_db &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - redis
+    links:
+      - redis
+
+  redis:
+    image: redis:6
+    container_name: redis
+
+  celery:
+    build:
+      context: .
+      dockerfile: gcartapp/gcartapp.dockerfile
+    volumes:
+      - ./gcartapp:/gcartapp
+    container_name: cl01
+    command: celery -A core worker -l info
+    links:
+      - redis
+
+networks:
+  default:
+    external:
+      name: box-net
 ```
 
 8. Create db folder in main directory, so that gcartapp and db are in same folder.
@@ -125,8 +184,8 @@ volumes:
 ```
 MYSQL_DATABASE=gcartapp
 MYSQL_USER=django
-MYSQL_PASSWORD=DjangoUserPassword
-MYSQL_ROOT_PASSWORD=DjangoRootPassword
+MYSQL_PASSWORD=!!CHANGE ME!!
+MYSQL_ROOT_PASSWORD=!!CHANGE ME!!
 ```
 
 10. Create gcartapp.dockerfile inside the app folder
@@ -221,12 +280,18 @@ exclude =
 ### gcartapp/core/.env
 
 ```
-SECRET_KEY=django-insecure-fz-79$*=!f#pu!oj2mlk2^cyp#0@)cbze_h2)xkp_r62mqoo=%
-DB_HOST=mysql
+SECRET_KEY=KET
+DB_HOST=db
 DB_NAME=gcartapp
 DB_USER=root
-DB_PASSWORD=DjangoRootPassword
+DB_PASSWORD=!!CHANGE ME!!
 PORT=3306
+EMAIL_HOST=!!CHANGE ME!!
+EMAIL_USE_TLS=True
+EMAIL_PORT=25
+RAZORPAY_ID=!!CHANGE ME!!
+RAZORPAY_SECRET=!!CHANGE ME!!
+SENDER_EMAIL=!!CHANGE ME!!
 ```
 
 Note: Shifted to root user since test needs access to create database
