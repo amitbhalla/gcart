@@ -6,6 +6,7 @@ from django.http.response import Http404
 from django.contrib import messages
 
 from store.models import Product, ReviewRating
+from orders.models import OrderProduct
 from category.models import Category
 from .forms import ReviewForm
 
@@ -48,9 +49,20 @@ class ProductView(base.View):
         product = get_object_or_404(
             Product, category=category, slug=product_slug
         )
+        if request.user.is_authenticated:
+            try:
+                order_product = OrderProduct.objects.filter(
+                    user=request.user, product_id=product
+                ).exists()
+
+            except OrderProduct.DoesNotExist:
+                order_product = False
+        else:
+            order_product = False
 
         context = {
             "product": product,
+            "order_product": order_product,
         }
         return render(request, "store/product_detail.html", context)
 

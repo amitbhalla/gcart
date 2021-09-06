@@ -109,6 +109,8 @@ class ActivatePageView(base.View):
 
 class LoginView(base.View):
     def get(self, request):
+        if request.user.is_authenticated:
+            return redirect("dashboard")
         return render(request, "user/login.html")
 
     def post(self, request):

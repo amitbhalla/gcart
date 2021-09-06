@@ -10,7 +10,7 @@ services:
       - ./gcartapp/container/media:/vol/web/media
       - ./gcartapp/container/static:/vol/web/static
     ports:
-      - 8000:8000
+      - 8001:8000
     command: >
       sh -c "
       python manage.py wait_for_db &&
@@ -52,3 +52,8 @@ services:
 
 volumes:
   data:
+
+networks:
+  default:
+    external:
+      name: box-net
