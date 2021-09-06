@@ -69,7 +69,7 @@
                 <header class="section-heading">
                     <h3>Customer Reviews </h3>
                 </header>
-                <form action="" method="POST">
+                <form action="{% url 'submit_review' product.id %}" method="POST">
                     {% csrf_token %}
                     <h5>Share your review.</h5>
                     <div>
@@ -103,7 +103,8 @@
                         Review:
                         <textarea name="review" rows="4" class="form-control"></textarea>
                         <br>
-                        <input type="submit" value="Submit Review" class="btn  btn-primary">
+                        <button type="submit" value="Submit Review" class="btn  btn-primary">
+                            Submit</button>
                         <br>
                         <br>
                     </div>

@@ -1,11 +1,13 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import base
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http.response import Http404
+from django.contrib import messages
 
-from store.models import Product
+from store.models import Product, ReviewRating
 from category.models import Category
+from .forms import ReviewForm
 
 
 class StoreView(base.View):
@@ -80,3 +82,33 @@ class SearchPageView(base.View):
         }
 
         return render(request, "store/store.html", context)
+
+
+class SubmitReviewView(base.View):
+    def post(self, request, product_id):
+        url = request.META.get("HTTP_REFERER")
+        try:
+            reviews = ReviewRating.objects.get(
+                user__id=request.user.id, product__id=product_id
+            )
+            form = ReviewForm(request.POST, instance=reviews)
+            form.save()
+            messages.success(
+                request, "Thank you! Your review has been updated."
+            )
+            return redirect(url)
+        except ReviewRating.DoesNotExist:
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                data = ReviewRating()
+                data.subject = form.cleaned_data["subject"]
+                data.rating = form.cleaned_data["rating"]
+                data.review = form.cleaned_data["review"]
+                data.ip = request.META.get("REMOTE_ADDR")
+                data.product_id = product_id
+                data.user_id = request.user.id
+                data.save()
+                messages.success(
+                    request, "Thank you! Your review has been submitted."
+                )
+                return redirect(url)
