@@ -60,9 +60,14 @@ class ProductView(base.View):
         else:
             order_product = False
 
+        reviews = ReviewRating.objects.filter(
+            product_id=product.id, status=True
+        )
+
         context = {
             "product": product,
             "order_product": order_product,
+            "reviews": reviews,
         }
         return render(request, "store/product_detail.html", context)
 
