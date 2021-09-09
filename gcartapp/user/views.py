@@ -17,6 +17,7 @@ from .forms import RegistrationForm
 from cart.models import Cart, CartItem
 from cart.views import get_session_id
 from .tasks import send_mail_task
+from orders.models import Order
 
 
 class RegisterView(base.View):
@@ -163,7 +164,14 @@ class LogoutView(base.View):
 class DashboardView(base.View):
     def get(self, request):
         if request.user.is_authenticated:
-            return render(request, "user/dashboard.html")
+            order = Order.objects.order_by("-created_at").filter(
+                user_id=request.user.id, is_ordered=True
+            )
+            order_count = order.count()
+            context = {
+                "order_count": order_count,
+            }
+            return render(request, "user/dashboard.html", context)
         else:
             messages.error(request, "You were not logged in!")
             return redirect("login")

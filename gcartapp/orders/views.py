@@ -175,7 +175,7 @@ class PaymentsView(base.View):
                     "order": order,
                 },
             )
-            to_email = request.user.email
+            to_email = order.email
             from_email = settings.SENDER_EMAIL
             send_mail_task.delay(mail_subject, message, to_email, from_email)
 
