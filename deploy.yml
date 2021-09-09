@@ -1,0 +1,65 @@
+version: "3"
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/nginx.dockerfile
+    ports:
+      - 1300:80
+    volumes:
+      - ./gcartapp:/gcartapp
+      - ./gcartapp/container/media:/vol/web/media
+      - ./gcartapp/container/static:/vol/web/static
+    depends_on:
+      - gcartapp
+    restart: "on-failure"
+
+  gcartapp:
+    build:
+      context: .
+      dockerfile: gcartapp/python.dockerfile
+    volumes:
+      - ./gcartapp:/gcartapp
+      - ./gcartapp/container/media:/vol/web/media
+      - ./gcartapp/container/static:/vol/web/static
+    ports:
+      - 8000:8000
+    command: >
+      sh -c "
+      python manage.py wait_for_db &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      gunicorn core.wsgi:application --bind 0.0.0.0:8000 --reload"
+    depends_on:
+      - db
+      - redis
+    links:
+      - redis
+
+  db:
+    image: mysql:8.0
+    volumes:
+      - ./data:/var/lib/mysql
+    env_file:
+      - db/db.env
+
+  redis:
+    image: redis:6
+    container_name: redis
+
+  celery:
+    build:
+      context: .
+      dockerfile: gcartapp/gcartapp.dockerfile
+    volumes:
+      - ./gcartapp:/gcartapp
+    container_name: cl01
+    command: celery -A core worker -l info
+    links:
+      - redis
+
+networks:
+  default:
+    external:
+      name: box-net
