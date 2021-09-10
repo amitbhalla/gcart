@@ -254,3 +254,18 @@ class ResetPasswordView(base.View):
 
     def get(self, request):
         return render(request, "user/reset_password.html")
+
+
+class MyOrders(base.View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            orders = Order.objects.filter(
+                user=request.user, is_ordered=True
+            ).order_by("-created_at")
+            context = {
+                "orders": orders,
+            }
+            return render(request, "user/my_orders.html", context)
+        else:
+            messages.error(request, "Please login first.")
+        return redirect("login")

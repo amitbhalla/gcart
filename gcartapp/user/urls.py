@@ -9,6 +9,7 @@ from .views import (
     ForgotPasswordView,
     ResetPasswordValidateView,
     ResetPasswordView,
+    MyOrders,
 )
 
 urlpatterns = [
@@ -56,5 +57,10 @@ urlpatterns = [
         "reset_password/",
         ResetPasswordView.as_view(),
         name="reset_password",
+    ),
+    path(
+        "my_orders/",
+        MyOrders.as_view(),
+        name="my_orders",
     ),
 ]
