@@ -1,9 +1,19 @@
+import os
+import uuid
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
+
+
+def profile_image(instance, filename):
+    """Generate file path for a resource"""
+    ext = filename.split(".")[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    return os.path.join("images/users/", filename)
 
 
 class UserManager(BaseUserManager):
@@ -47,3 +57,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    address_line_1 = models.CharField(max_length=255, blank=True)
+    address_line_2 = models.CharField(max_length=255, blank=True)
+    profile_picture = models.ImageField(upload_to=profile_image, blank=True)
+    city = models.CharField(max_length=255, blank=True)
+    state = models.CharField(max_length=255, blank=True)
+    country = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return str(self.user.full_name)
+
+    def full_address(self):
+        return "{}, {}".format(self.address_line_1, self.address_line_2)

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext as _
 
-from .models import User
+from .models import User, UserProfile
 
 
 @admin.register(User)
@@ -88,3 +88,24 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "address_line_1",
+        "address_line_2",
+        "city",
+        "state",
+        "country",
+        "id",
+    )
+    list_display_links = ("user", "id")
+    list_filter = [
+        "user",
+    ]
+    ordering = [
+        "id",
+    ]
+    readonly_fields = ("id",)
