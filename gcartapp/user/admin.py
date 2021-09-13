@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext as _
+from django.utils.html import format_html
 
 from .models import User, UserProfile
 
@@ -92,7 +93,16 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
+    def thumbnail(self, object):
+        return format_html(
+            '<img src="{}" width="30" height="30" style="border-radius:50%;">'.format(
+                object.profile_picture.url
+            )
+        )
+
+    thumbnail.short_description = "Profile Picture"
     list_display = (
+        "thumbnail",
         "user",
         "address_line_1",
         "address_line_2",
