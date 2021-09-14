@@ -1,6 +1,6 @@
 import shortuuid
 from django.contrib import messages, auth
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import base
 from django.urls import reverse
 from django.conf import settings
@@ -13,10 +13,11 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 
-from .forms import RegistrationForm
+from .forms import RegistrationForm, UserForm, UserProfileForm
+from .tasks import send_mail_task
+from .models import UserProfile
 from cart.models import Cart, CartItem
 from cart.views import get_session_id
-from .tasks import send_mail_task
 from orders.models import Order
 
 
@@ -50,6 +51,11 @@ class RegisterView(base.View):
                 phone_number=phone_number,
             )
 
+            profile = UserProfile()
+            profile.user_id = user.id
+            profile.profile_picture = "default/default-user.png"
+            profile.save()
+
             # Email functionality
             current_site = get_current_site(request)
             mail_subject = "Please activate your account!"
@@ -64,12 +70,7 @@ class RegisterView(base.View):
             )
             to_email = email
             from_email = settings.SENDER_EMAIL
-            # send_email = EmailMessage(
-            #     mail_subject, message, to=[to_email], from_email=from_email
-            # )
-            # send_email.send()
             send_mail_task.delay(mail_subject, message, to_email, from_email)
-            #
 
             return redirect(
                 reverse("login") + "?command=verification&email=" + email
@@ -256,7 +257,7 @@ class ResetPasswordView(base.View):
         return render(request, "user/reset_password.html")
 
 
-class MyOrders(base.View):
+class MyOrdersView(base.View):
     def get(self, request):
         if request.user.is_authenticated:
             orders = Order.objects.filter(
@@ -269,3 +270,30 @@ class MyOrders(base.View):
         else:
             messages.error(request, "Please login first.")
         return redirect("login")
+
+
+class EditProfileView(base.View):
+    def post(self, request):
+        userprofile = get_object_or_404(UserProfile, user=request.user)
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(
+            request.POST, request.FILES, instance=userprofile
+        )
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect("edit_profile")
+
+    def get(self, request):
+
+        user_form = UserForm(instance=request.user)
+        userprofile = UserProfile.objects.get(user=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+
+        context = {
+            "user_form": user_form,
+            "profile_form": profile_form,
+            "userprofile": userprofile,
+        }
+        return render(request, "user/edit_profile.html", context)
