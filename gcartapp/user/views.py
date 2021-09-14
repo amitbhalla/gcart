@@ -18,7 +18,7 @@ from .tasks import send_mail_task
 from .models import UserProfile
 from cart.models import Cart, CartItem
 from cart.views import get_session_id
-from orders.models import Order
+from orders.models import Order, OrderProduct
 
 
 class RegisterView(base.View):
@@ -331,3 +331,21 @@ class ChangePasswordView(base.View):
         else:
             messages.error(request, "Password does not match!")
             return redirect("change_password")
+
+
+class OrderDetailView(base.View):
+    def get(self, request, order_id):
+        order_detail = OrderProduct.objects.filter(
+            order__order_number=order_id
+        )
+        order = Order.objects.get(order_number=order_id)
+        subtotal = 0
+        for i in order_detail:
+            subtotal += i.product_price * i.quantity
+
+        context = {
+            "order_detail": order_detail,
+            "order": order,
+            "subtotal": subtotal,
+        }
+        return render(request, "user/order_detail.html", context)

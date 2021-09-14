@@ -12,6 +12,7 @@ from .views import (
     MyOrdersView,
     EditProfileView,
     ChangePasswordView,
+    OrderDetailView,
 )
 
 urlpatterns = [
@@ -74,5 +75,10 @@ urlpatterns = [
         "change_password/",
         ChangePasswordView.as_view(),
         name="change_password",
+    ),
+    path(
+        "order_detail/<str:order_id>/",
+        OrderDetailView.as_view(),
+        name="order_detail",
     ),
 ]
