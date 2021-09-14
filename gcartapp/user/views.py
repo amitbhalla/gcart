@@ -269,7 +269,7 @@ class MyOrdersView(base.View):
             return render(request, "user/my_orders.html", context)
         else:
             messages.error(request, "Please login first.")
-        return redirect("login")
+            return redirect("login")
 
 
 class EditProfileView(base.View):
@@ -286,14 +286,48 @@ class EditProfileView(base.View):
             return redirect("edit_profile")
 
     def get(self, request):
+        if request.user.is_authenticated:
+            user_form = UserForm(instance=request.user)
+            userprofile = UserProfile.objects.get(user=request.user)
+            profile_form = UserProfileForm(instance=userprofile)
 
-        user_form = UserForm(instance=request.user)
-        userprofile = UserProfile.objects.get(user=request.user)
-        profile_form = UserProfileForm(instance=userprofile)
+            context = {
+                "user_form": user_form,
+                "profile_form": profile_form,
+                "userprofile": userprofile,
+            }
+            return render(request, "user/edit_profile.html", context)
+        else:
+            messages.error(request, "Please login first.")
+            return redirect("login")
 
-        context = {
-            "user_form": user_form,
-            "profile_form": profile_form,
-            "userprofile": userprofile,
-        }
-        return render(request, "user/edit_profile.html", context)
+
+class ChangePasswordView(base.View):
+    def get(self, request):
+        return render(request, "user/change_password.html")
+
+    def post(self, request):
+        current_password = request.POST["current_password"]
+        new_password = request.POST["new_password"]
+        confirm_password = request.POST["confirm_password"]
+
+        user = auth.get_user_model().objects.get(
+            username__exact=request.user.username
+        )
+
+        if new_password == confirm_password:
+            success = user.check_password(current_password)
+            if success:
+                user.set_password(new_password)
+                user.save()
+                messages.success(
+                    request,
+                    "Password updated successfully. Please sign in again.",
+                )
+                return redirect("login")
+            else:
+                messages.error(request, "Please enter valid current password")
+                return redirect("change_password")
+        else:
+            messages.error(request, "Password does not match!")
+            return redirect("change_password")

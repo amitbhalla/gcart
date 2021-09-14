@@ -11,6 +11,7 @@ from .views import (
     ResetPasswordView,
     MyOrdersView,
     EditProfileView,
+    ChangePasswordView,
 )
 
 urlpatterns = [
@@ -68,5 +69,10 @@ urlpatterns = [
         "edit_profile/",
         EditProfileView.as_view(),
         name="edit_profile",
+    ),
+    path(
+        "change_password/",
+        ChangePasswordView.as_view(),
+        name="change_password",
     ),
 ]
