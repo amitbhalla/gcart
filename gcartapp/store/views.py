@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http.response import Http404
 from django.contrib import messages
 
-from store.models import Product, ReviewRating
+from store.models import Product, ReviewRating, ProductGallery
 from orders.models import OrderProduct
 from category.models import Category
 from .forms import ReviewForm
@@ -63,11 +63,12 @@ class ProductView(base.View):
         reviews = ReviewRating.objects.filter(
             product_id=product.id, status=True
         )
-
+        product_gallery = ProductGallery.objects.filter(product_id=product.id)
         context = {
             "product": product,
             "order_product": order_product,
             "reviews": reviews,
+            "product_gallery": product_gallery,
         }
         return render(request, "store/product_detail.html", context)
 
