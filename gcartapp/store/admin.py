@@ -1,6 +1,13 @@
+import admin_thumbnails
 from django.contrib import admin
 
-from .models import Product, Variation, ReviewRating
+from .models import Product, Variation, ReviewRating, ProductGallery
+
+
+@admin_thumbnails.thumbnail("image")
+class ProdGallaryInline(admin.TabularInline):
+    model = ProductGallery
+    extra = 1
 
 
 @admin.register(Product)
@@ -34,6 +41,7 @@ class ProductAdmin(admin.ModelAdmin):
         "id",
     ]
     readonly_fields = ("id",)
+    inlines = [ProdGallaryInline]
 
 
 @admin.register(Variation)
@@ -89,6 +97,26 @@ class ReviewRatingAdmin(admin.ModelAdmin):
         "status",
         "product",
         "user",
+    ]
+    ordering = [
+        "id",
+    ]
+    readonly_fields = ("id",)
+
+
+@admin.register(ProductGallery)
+class ProductGalleryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "product",
+    )
+    list_display_links = (
+        "id",
+        "product",
+    )
+
+    list_filter = [
+        "product",
     ]
     ordering = [
         "id",
